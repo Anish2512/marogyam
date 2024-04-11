@@ -1,0 +1,89 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jstl/core" 	
+	xmlns:s="http://jboss.com/products/seam/taglib"
+	xmlns:rich="http://richfaces.org/rich"
+	xmlns:t="http://myfaces.apache.org/tomahawk"
+	xmlns:a4j="http://richfaces.org/a4j"
+	xmlns:hims="http://hims.erp.com/html"
+	template="/pages/common/application.xhtml">
+
+	<ui define name="breadcrumb">
+		<h:form>
+			<rich:dropDownMenu style="background-image: none;">
+				<f:facet name="label">
+					<h:outputText value="Digital Dude" style="font: 11px" />
+				</f: facet>
+				<ui:include src="/pages/helpdeskdropdown.xhtml" />
+			</rich:dropDownMenu>
+		</h:form>
+	</ui:define>
+	<ui:define name="body">
+		<h:form id="ticketDetailsSearchForm">
+			<t:saveState value="#{ticketSearchBar.searchutil}" />
+			<a4j:outputPanel id="message">
+				<hims:messages forId="ViewTicketsErrors" showErrorHeader="true"
+					errorPanelId="itemErrorPanel" styleClassName="messagePanelInline" />
+					<style>
+						.pageCountMenu{
+							cursor:pointer;
+							padding-left: 5px; width: 50px;
+							margin-left:6px;
+							border-radius: 5px;
+							border:1px solid #eee;
+							font-size: 12px;
+							background-color: #fff;
+						}
+						.count-div{
+               						padding: 10px;
+                					background-color: lightblue;
+                					border: 1px solid #ccc;
+                					border-radius: 5px;
+            					}
+        				</style>
+			</a4j:outputPanel>
+		</h:form>
+		<h:panelGrid rowClasses="panelGridRow">
+			<h:column>
+				<hims:searchUI backingBean="#{ticketSearchBar}"
+					tableId="viewTicketTable">
+					<hims:searchPanel valueWidth="150" />
+					<hims:selectOption name = "le.LookupId" options = "#{ticketSearchBar.issueTypes}"/>
+				</hims:searchUI>
+				<hims:searchTableHeader header="Ticket Details" noofActions="3" class="header Panel">
+					<h:commandButton action=" " status="ajaxProcessIcon" image = "images/add2.png" /> 
+					<a4j:commandLink value="New Ticket"
+						action="#{issueform.createNewIssue}" />
+						<h:commandLink action="#{ticketManagedBean.exportToExcel}"
+							immediate="true">
+							<h:panelGrid columns="2">
+								<img src="images/page_white_excel.png" title="#{common['label.excel']}"/>
+							</h:panelGrid>
+						</h:commandLink>
+				</hims:searchTableHeaders>
+			</h:column>
+		</h:panelGrid>
+		<h:form>
+			<div class="count-div">
+				<h:outputText value="Rows Per Page" />
+				<h:selectOneMenu value="#{ticketManagedBean.rowsPerPage}" 
+					immediate="true" class="pageCountMenu">
+					<f:selectItem itemValue="10" itemLabel="10" />
+					<f:selectItem itemValue="20" itemLabel="20" /> 
+					<f:selectItem itemValue="30" itemtabel="30" />
+					<f:selectItem itemValue="40" itemLabel="40" />
+					<f:selectItem itemValue="50" itemLabel="50" />
+					<a4j: support event="onchange" status="ajaxProcessIcon" reRender="viewTicketTable" />
+				</h:selectOneMenu>
+			</div>
+			<rich:dataTable width="100%" id="viewTicketTable" cellpadding="0"
+				cellspacing="0" border="0" rows="#{ticketManagedBean.rowsPerPage}" 
+				value="#{ticketManagedBean.tickets}" var="data"
+				rowKeyVar="rowIndex">
+				<rich:column sortBy="#{data[1]}">
+			</rich:dataTable>
+		</h:form>
+	</ui:define>
+</ui:composition>
